@@ -13,7 +13,7 @@ import unidecode
 
 from pymongo import MongoClient
 
-client = MongoClient('10.42.0.16')
+client = MongoClient('localhost')
 db = client.reco_bot_2
 
 def similar(seq1, seq2):
@@ -33,6 +33,7 @@ def similar_users(user):
 
     data = Data()
     data.load('./dc_recom.dat', sep='::', format={'col':1,'row':0})
+    print 'nix'
     svd = SVD()
     svd.set_data(data)
     svd.compute(k=1000,min_values=0, pre_normalize=None, mean_center=False, post_normalize=True)
@@ -80,5 +81,22 @@ def recommended_files(user):
             res.append(p)
             c_res += 1
             if c_res > 10:
-                return ['magnet:?xt=urn:tree:tiger:'+i[0] for i in res]
-    return ['magnet:?xt=urn:tree:tiger:'+i[0] for i in res]
+                k = []
+                for i in res:
+                    try:
+                        j = 'magnet:?xt=urn:tree:tiger:'+i[0] + "&dn=" + unidecode.unidecode(db.tths.find_one({'tth': i[0]})['name'])
+                    except:
+                        print i[0]
+                        j = 'magnet:?xt=urn:tree:tiger:'+i[0]
+                    k.append(j)
+                return k
+    k = []
+    for i in res:
+        try:
+            j = 'magnet:?xt=urn:tree:tiger:'+i[0] + "&dn=" + unidecode.unidecode(db.tths.find_one({'tth': i[0]})['name'])
+        except:
+            print i[0]
+            j = 'magnet:?xt=urn:tree:tiger:'+i[0]
+        k.append(j)
+
+    return k

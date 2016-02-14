@@ -2,7 +2,7 @@ import sys
 from pymongo import MongoClient
 import unidecode
 
-client = MongoClient('10.42.0.16')
+client = MongoClient('localhost')
 db = client.reco_bot_2
 
 def dat_build():
