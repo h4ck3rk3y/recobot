@@ -26,12 +26,12 @@ Implements user-user based collaborative filtering where the items are the tth o
 - You will be prompted to build the recommendation file. Press y on first run.
 
 ## Acknowledgements
-- [pydc-sheriffbot](https://github.com/kaustubh-karkare/pydc-sheriffbot/) by Kaustab Karkare
+- [pydc-sheriffbot](https://github.com/kaustubh-karkare/pydc-sheriffbot/) by [Kaustubh Karkare](https://github.com/kaustubh-karkare)
 - The above bot allowed us to connect with dc++ via python. Had to fix some bugs to get the code running.
 
 ## Built By
-- @shubh24
-- @h4ck3rk3y
+- [@shubh24](https://github.com/shubh24)
+- [@h4ck3rk3y](https://github.com/h4ck3rk3y)
 
 ## ToDo
 - Search Instant
