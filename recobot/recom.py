@@ -9,61 +9,76 @@ import difflib
 from scipy.linalg import norm
 import divisi2
 from recsys.algorithm.matrix import *
+import unidecode
 
 from pymongo import MongoClient
 
 client = MongoClient('10.42.0.16')
 db = client.reco_bot_2
 
-
-data = Data()
-data.load('./dc_recom.dat', sep='::', format={'col':1,'row':0})
-
-
 def similar(seq1, seq2):
     return difflib.SequenceMatcher(a=seq1.lower(), b=seq2.lower()).ratio()>0.4
 
-def similar_users(user, data=data):
+def similar_users(user):
+    if not type(user) is str:
+        user = unidecode.unidecode(user)
+    if db.done_users.find_one({'user':user})['recommended']==False:
+        user_files = db.user_list.find({'user':user})
+        f = open('./dc_recom.dat','a')
+        for u in user_files:
+            f.write(u['user'] + '::' + u['tth'])
+            f.write('\n')
+        f.close()
+        db.done_users.update({'user': user}, {'user':user, 'recommended': True})
+
+    data = Data()
+    data.load('./dc_recom.dat', sep='::', format={'col':1,'row':0})
     svd = SVD()
     svd.set_data(data)
     svd.compute(k=1000,min_values=0, pre_normalize=None, mean_center=False, post_normalize=True)
     return [i[0] for i in svd.similar(user)]
 
+def recommended_files(user):
+    if not type(user) is str:
+        user = unidecode.unidecode(user)
+    if db.done_users.find_one({'user':user})['recommended']==False:
+        user_files = db.user_list.find({'user':user})
+        f = open('./dc_recom.dat','a')
+        for u in user_files:
+            f.write(u['user'] + '::' + u['tth'])
+            f.write('\n')
+        f.close()
+        db.done_users.update({'user': user}, {'user':user, 'recommended': True})
 
-
-def recommended_files(user,data=data):
+    data = Data()
+    data.load('./dc_recom.dat', sep='::', format={'col':1,'row':0})
     svd = SVD()
     svd.set_data(data)
     svd.compute(k=1000,min_values=0, pre_normalize=None, mean_center=False, post_normalize=True)
-    similar_users = [i[0] for i in svd.similar(user)]
+    similar_users = [i[0] for i in svd.similar(user,n=10)]
 
-    #recoms = svd.recommend(user,is_row=True,only_unknowns=True,n=50)
-    predict_arr = []
+    newdata = Data()
+    for i in range(0,len(similar_users),1):
+        files = db.user_list.find({'user':similar_users[i]})
+        for f in files:
+            newdata.add_tuple((1.0,similar_users[i],f['tth']))
+    svd.set_data(newdata)
+    svd.compute(k=1000,min_values=0, pre_normalize=None, mean_center=False, post_normalize=True)
+    recoms = svd.recommend(user,is_row=True,only_unknowns=True,n=100)
 
-    user_tths = db.user_list.find({'user':user})
-    tths = [i['tth'] for i in user_tths]
-    movie_names = []
-
-    for i in similar_users[1:]:
-        for j in db.user_list.find({'user':i}):
-            if j['tth'] not in tths:
-                movie_name = db.tths.find_one({'tth':j['tth']})['name']
-                movie_names.append(movie_name)
-                tths.append(j['tth'])
-                predict_arr.append((movie_name,j['tth'],svd.predict(user,j['tth'])))
-
-    predict_arr = sorted(predict_arr,key=lambda x:x[2],reverse=True)
     res = []
     c_res = 0
-    for p in predict_arr:
+    print len(recoms)
+    for p in recoms:
         flag=0
         for r in res:
-            if similar(p[0],r[0]):
+            if similar(db.tths.find_one({'tth':p[0]})['name'],db.tths.find_one({'tth':r[0]})['name']):
                 flag = 1
                 break
+                print c_res
         if flag == 0:
-            res.append(p[1])
+            res.append(p)
             c_res += 1
             if c_res > 10:
-                return res
-
+                return ['magnet:?xt=urn:tree:tiger:'+i[0] for i in res]
+    return ['magnet:?xt=urn:tree:tiger:'+i[0] for i in res]
