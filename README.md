@@ -18,6 +18,7 @@ Implements user-user based collaborative filtering where the items are the tth o
 ## Running instructions
 
 - Configure recobot.py with your nick, hubname, ip address and password.
+- Configure the ip addresses in mongo if you are using anything else apart from mongohost.
 - You can add support for more file types by changing the supported_file_types list in recobot.py.
 - Minimum file size has been set to 100 Mb, you can change that too on line 76.
 - After you are done configuring try `python recobot.py`
