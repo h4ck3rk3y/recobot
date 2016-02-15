@@ -33,7 +33,6 @@ def similar_users(user):
 
     data = Data()
     data.load('./dc_recom.dat', sep='::', format={'col':1,'row':0})
-    print 'nix'
     svd = SVD()
     svd.set_data(data)
     svd.compute(k=1000,min_values=0, pre_normalize=None, mean_center=False, post_normalize=True)
@@ -69,14 +68,12 @@ def recommended_files(user):
 
     res = []
     c_res = 0
-    print len(recoms)
     for p in recoms:
         flag=0
         for r in res:
             if similar(db.tths.find_one({'tth':p[0]})['name'],db.tths.find_one({'tth':r[0]})['name']):
                 flag = 1
                 break
-                print c_res
         if flag == 0:
             res.append(p)
             c_res += 1
@@ -86,7 +83,6 @@ def recommended_files(user):
                     try:
                         j = 'magnet:?xt=urn:tree:tiger:'+i[0] + "&dn=" + unidecode.unidecode(db.tths.find_one({'tth': i[0]})['name'])
                     except:
-                        print i[0]
                         j = 'magnet:?xt=urn:tree:tiger:'+i[0]
                     k.append(j)
                 return k
@@ -95,7 +91,6 @@ def recommended_files(user):
         try:
             j = 'magnet:?xt=urn:tree:tiger:'+i[0] + "&dn=" + unidecode.unidecode(db.tths.find_one({'tth': i[0]})['name'])
         except:
-            print i[0]
             j = 'magnet:?xt=urn:tree:tiger:'+i[0]
         k.append(j)
 
