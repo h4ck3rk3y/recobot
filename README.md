@@ -1,8 +1,8 @@
-#Recommendation BOT for DC++
+# Recommendation BOT for DC++
 
 Generates recommendations as per the filelists of users in the hub.
 
-##Requirements
+## Requirements
 - mongodb
 - python-recsys
 - python2.7+
@@ -13,6 +13,8 @@ Implements user-user based collaborative filtering where the items are the tth o
 
 ## Installation
 
+- git clone https://github.com/h4ck3rk3y/recobot
+- cd recobot
 - `pip install -r requirements.txt`
 
 ## Running instructions
